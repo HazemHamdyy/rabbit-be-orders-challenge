@@ -148,7 +148,6 @@ async function main() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       // DURING CREATE ORDER ITEM FIELD orderId, productId UNIQUE CONSTRAINT VIOLATED
-      console.warn('unique constraint violated during random creation');
     }
   }
   console.log('Seeding finished');
