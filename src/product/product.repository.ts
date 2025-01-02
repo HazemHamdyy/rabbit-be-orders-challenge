@@ -16,7 +16,11 @@ export class ProductRepository {
     });
   }
 
-  async create(data: { name: string; category: string }): Promise<Product> {
+  async create(data: {
+    name: string;
+    categoryId: number;
+    areaId: number;
+  }): Promise<Product> {
     return this.prisma.product.create({ data });
   }
 }

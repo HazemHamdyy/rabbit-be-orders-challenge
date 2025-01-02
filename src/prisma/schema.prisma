@@ -1,5 +1,5 @@
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -8,26 +8,50 @@ generator client {
 }
 
 model Product {
-  id        Int      @id @default(autoincrement())
-  name      String
-  category  String
-  area String
-  orders    OrderItem[]
-  createdAt DateTime @default(now())
+  id         Int         @id @default(autoincrement())
+  name       String
+  categoryId Int        // DELETE CATEGORY FIELD AND CREATE CATEGORY MODEL AND ASSIGN ONE-TO-MANY RELATION BETWEEN THEM
+  areaId     Int        // DELETE AREA FIELD AND CREATE AREA MODEL TO SAVE THE BOUNDARY IN IT
+  createdAt  DateTime    @default(now())
+  category   Category    @relation(fields: [categoryId], references: [id])
+  orders     OrderItem[]
+  area       Area        @relation(fields: [areaId], references: [id])
+
+// FOR EASIER FILTER WITH CATEGORY ID
+  @@index([categoryId])
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
 }
 
 model Order {
-  id         Int          @id @default(autoincrement())
+  id         Int         @id @default(autoincrement())
   customerId Int
+  areaId     Int         // MORE REALISTIC THAT EACH ORDER IS ON SPACIFIC AREA
+  area       Area        @relation(fields: [areaId], references: [id])
   items      OrderItem[]
-  createdAt  DateTime     @default(now())
+  createdAt  DateTime    @default(now())
 }
 
 model OrderItem {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   quantity  Int
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
   productId Int
-  order     Order    @relation(fields: [orderId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id])
   orderId   Int
+
+// MUST BE UNIQUE 
+  @@unique([orderId, productId])
+}
+
+model Area {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  boundary Json     // BOUNDARY OF THE POLYGON OF THE AREA
+  products Product[]
+  orders   Order[]
 }
