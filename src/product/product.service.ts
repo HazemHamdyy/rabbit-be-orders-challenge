@@ -71,6 +71,26 @@ export class ProductService {
       return cachedProducts;
     }
 
+    // BY RAW SQL FOR MORE CONTROLLING
+    // const result: any[] = await this.prismaService.$queryRaw`
+    // SELECT p.id, p.name, SUM(oi.quantity) AS total_quantity
+    // FROM "OrderItem" oi
+    // JOIN "Product" p ON oi."productId" = p.id
+    // JOIN "Order" o ON oi."orderId" = o.id
+    // WHERE o."areaId" = ${areaId}
+    // AND p."areaId" = ${areaId}
+    // GROUP BY p.id
+    // ORDER BY total_quantity DESC
+    // LIMIT 10;`;
+
+    // const topProducts = result.map((row: any) => ({
+    //   id: row.id,
+    //   name: row.name,
+    //   totalOrdered: Number(row.total_quantity),
+    // }));
+
+    ////////////////////////////////////////////////////////
+
     // AGGREGTION FUNCTION TO GET THE TOP PRODUCTS ID BASED ON THE AREA THAT THE PRODUCT ORDERED AT AND IF THE PRODUCT IS NOW IN THIS AREA OR NOT
     const aggregationResult = await this.prismaService.orderItem.groupBy({
       by: ['productId'],
